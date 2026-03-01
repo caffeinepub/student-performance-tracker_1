@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("/assets/fonts/CabinetGrotesk-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/assets/fonts/Satoshi-Variable.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Slate-teal professional theme */
+    --background: 0.975 0.005 240;
+    --foreground: 0.18 0.025 255;
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.025 255;
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.025 255;
+    --primary: 0.42 0.12 255;
+    --primary-foreground: 0.98 0 0;
+    --secondary: 0.94 0.012 255;
+    --secondary-foreground: 0.28 0.04 255;
+    --muted: 0.94 0.008 240;
+    --muted-foreground: 0.52 0.02 255;
+    --accent: 0.94 0.012 255;
+    --accent-foreground: 0.28 0.04 255;
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+    --success: 0.56 0.16 150;
+    --success-foreground: 0.98 0 0;
+    --warning: 0.72 0.16 60;
+    --warning-foreground: 0.18 0 0;
+    --border: 0.88 0.015 255;
+    --input: 0.9 0.01 255;
+    --ring: 0.42 0.12 255;
+
+    /* Chart colors - accessible data viz palette */
+    --chart-1: 0.52 0.18 255;
+    --chart-2: 0.56 0.16 150;
+    --chart-3: 0.68 0.2 35;
+    --chart-4: 0.64 0.2 295;
+    --chart-5: 0.6 0.18 195;
+    --chart-above: 0.56 0.16 150;
+    --chart-below: 0.577 0.245 27.325;
+    --chart-neutral: 0.52 0.02 255;
+
+    /* Sidebar */
+    --sidebar: 0.16 0.04 255;
+    --sidebar-foreground: 0.88 0.02 255;
+    --sidebar-primary: 0.62 0.2 255;
+    --sidebar-primary-foreground: 0.98 0 0;
+    --sidebar-accent: 0.24 0.05 255;
+    --sidebar-accent-foreground: 0.9 0.01 255;
+    --sidebar-border: 0.28 0.04 255;
+    --sidebar-ring: 0.62 0.2 255;
+  }
+
+  .dark {
+    --background: 0.12 0.03 255;
+    --foreground: 0.94 0.01 255;
+    --card: 0.16 0.035 255;
+    --card-foreground: 0.94 0.01 255;
+    --popover: 0.19 0.04 255;
+    --popover-foreground: 0.94 0.01 255;
+    --primary: 0.62 0.2 255;
+    --primary-foreground: 0.12 0.03 255;
+    --secondary: 0.24 0.05 255;
+    --secondary-foreground: 0.88 0.02 255;
+    --muted: 0.22 0.04 255;
+    --muted-foreground: 0.6 0.02 255;
+    --accent: 0.24 0.05 255;
+    --accent-foreground: 0.88 0.02 255;
+    --destructive: 0.65 0.22 27;
+    --destructive-foreground: 0.12 0.02 0;
+    --success: 0.55 0.15 150;
+    --success-foreground: 0.12 0 0;
+    --warning: 0.7 0.16 60;
+    --warning-foreground: 0.12 0 0;
+    --border: 0.28 0.04 255;
+    --input: 0.26 0.04 255;
+    --ring: 0.62 0.2 255;
+
+    --chart-1: 0.62 0.2 255;
+    --chart-2: 0.6 0.18 150;
+    --chart-3: 0.72 0.2 45;
+    --chart-4: 0.67 0.22 295;
+    --chart-5: 0.65 0.18 195;
+    --chart-above: 0.6 0.18 150;
+    --chart-below: 0.65 0.22 27;
+    --chart-neutral: 0.55 0.02 255;
+
+    --sidebar: 0.12 0.03 255;
+    --sidebar-foreground: 0.88 0.02 255;
+    --sidebar-primary: 0.62 0.2 255;
+    --sidebar-primary-foreground: 0.12 0.03 255;
+    --sidebar-accent: 0.2 0.04 255;
+    --sidebar-accent-foreground: 0.88 0.02 255;
+    --sidebar-border: 0.22 0.04 255;
+    --sidebar-ring: 0.62 0.2 255;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Satoshi", sans-serif;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(var(--muted));
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--muted-foreground));
+}
+
+/* Chart container fix */
+.recharts-responsive-container {
+  min-height: 0;
+}
