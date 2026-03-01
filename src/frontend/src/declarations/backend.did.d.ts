@@ -17,6 +17,11 @@ export interface Assessment {
   'name' : string,
   'term' : string,
 }
+export interface BehaviourRecord {
+  'studentId' : bigint,
+  'behaviourComment' : string,
+  'advice' : string,
+}
 export interface Mark {
   'studentId' : bigint,
   'score' : bigint,
@@ -25,6 +30,7 @@ export interface Mark {
 }
 export interface Student { 'id' : bigint, 'name' : string, 'grade' : string }
 export interface Subject { 'id' : bigint, 'name' : string }
+export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -43,11 +49,16 @@ export interface _SERVICE {
   'getAllMarks' : ActorMethod<[], Array<Mark>>,
   'getAllStudents' : ActorMethod<[], Array<Student>>,
   'getAllSubjects' : ActorMethod<[], Array<Subject>>,
+  'getBehaviourRecord' : ActorMethod<[bigint], [] | [BehaviourRecord]>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getMarksByAssessment' : ActorMethod<[bigint, bigint], Array<Mark>>,
   'getMarksByStudent' : ActorMethod<[bigint], Array<Mark>>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'importMarks' : ActorMethod<[Array<Mark>], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'saveBehaviourRecord' : ActorMethod<[bigint, string, string], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updateAssessment' : ActorMethod<
     [bigint, string, string, string, bigint],
     undefined

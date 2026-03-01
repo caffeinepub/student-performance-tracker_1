@@ -1,15 +1,15 @@
 import Map "mo:core/Map";
 import Array "mo:core/Array";
+import Nat "mo:core/Nat";
 import Iter "mo:core/Iter";
+import Order "mo:core/Order";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
-import Nat "mo:core/Nat";
-import Order "mo:core/Order";
+import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
 actor {
-  // Data Types
   type Student = {
     id : Nat;
     name : Text;
@@ -36,57 +36,96 @@ actor {
     score : Nat;
   };
 
-  // Auto-increment IDs
+  type BehaviourRecord = {
+    studentId : Nat;
+    behaviourComment : Text;
+    advice : Text;
+  };
+
+  type UserProfile = {
+    name : Text;
+  };
+
   var nextStudentId = 1;
   var nextSubjectId = 1;
   var nextAssessmentId = 1;
 
-  module Student {
-    public func compare(student1 : Student, student2 : Student) : Order.Order {
-      Nat.compare(student1.id, student2.id);
-    };
+  func compareStudents(student1 : Student, student2 : Student) : Order.Order {
+    Nat.compare(student1.id, student2.id);
   };
 
-  module Subject {
-    public func compare(subject1 : Subject, subject2 : Subject) : Order.Order {
-      Nat.compare(subject1.id, subject2.id);
-    };
+  func compareSubjects(subject1 : Subject, subject2 : Subject) : Order.Order {
+    Nat.compare(subject1.id, subject2.id);
   };
 
-  module Assessment {
-    public func compare(assessment1 : Assessment, assessment2 : Assessment) : Order.Order {
-      Nat.compare(assessment1.id, assessment2.id);
-    };
+  func compareAssessments(assessment1 : Assessment, assessment2 : Assessment) : Order.Order {
+    Nat.compare(assessment1.id, assessment2.id);
   };
 
-  module Mark {
-    public func compare(mark1 : Mark, mark2 : Mark) : Order.Order {
-      switch (Nat.compare(mark1.studentId, mark2.studentId)) {
-        case (#equal) {
-          switch (Nat.compare(mark1.subjectId, mark2.subjectId)) {
-            case (#equal) { Nat.compare(mark1.assessmentId, mark2.assessmentId) };
-            case (order) { order };
-          };
+  func compareMarks(mark1 : Mark, mark2 : Mark) : Order.Order {
+    switch (Nat.compare(mark1.studentId, mark2.studentId)) {
+      case (#equal) {
+        switch (Nat.compare(mark1.subjectId, mark2.subjectId)) {
+          case (#equal) { Nat.compare(mark1.assessmentId, mark2.assessmentId) };
+          case (order) { order };
         };
-        case (order) { order };
       };
+      case (order) { order };
     };
   };
 
-  // Persistent Storage
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
   let students = Map.empty<Nat, Student>();
   let subjects = Map.empty<Nat, Subject>();
   let assessments = Map.empty<Nat, Assessment>();
   let marks = Map.empty<Text, Mark>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
+  let behaviourRecords = Map.empty<Nat, BehaviourRecord>();
 
-  // Helper for mark keys
   func markKey(studentId : Nat, subjectId : Nat, assessmentId : Nat) : Text {
     studentId.toText() # "-" # subjectId.toText() # "-" # assessmentId.toText();
   };
 
-  // Authorization
-  let accessControlState = AccessControl.initState();
-  include MixinAuthorization(accessControlState);
+  // User Profile Functions
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view profiles");
+    };
+    userProfiles.get(caller);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller.notEqual(user) and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
+
+  // Behaviour Record Functions
+  public shared ({ caller }) func saveBehaviourRecord(studentId : Nat, behaviourComment : Text, advice : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can save behaviour records");
+    };
+    let record : BehaviourRecord = {
+      studentId;
+      behaviourComment;
+      advice;
+    };
+    behaviourRecords.add(studentId, record);
+  };
+
+  public query func getBehaviourRecord(studentId : Nat) : async ?BehaviourRecord {
+    behaviourRecords.get(studentId);
+  };
 
   // Student CRUD
   public shared ({ caller }) func createStudent(name : Text, grade : Text) : async Nat {
@@ -235,47 +274,53 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only teachers can import marks");
     };
-    bulkMarks.forEach(
-      func(mark) {
-        marks.add(markKey(mark.studentId, mark.subjectId, mark.assessmentId), mark);
-      }
-    );
+    bulkMarks.forEach(func(mark) { marks.add(markKey(mark.studentId, mark.subjectId, mark.assessmentId), mark) });
   };
 
-  // Data Queries (open to all)
+  // Query Functions - Protected with user authorization
   public query ({ caller }) func getAllStudents() : async [Student] {
-    students.values().toArray().sort();
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view students");
+    };
+    students.values().toArray().sort(compareStudents);
   };
 
   public query ({ caller }) func getAllSubjects() : async [Subject] {
-    subjects.values().toArray().sort();
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view subjects");
+    };
+    subjects.values().toArray().sort(compareSubjects);
   };
 
   public query ({ caller }) func getAllAssessments() : async [Assessment] {
-    assessments.values().toArray().sort();
-  };
-
-  public query ({ caller }) func getMarksByStudent(studentId : Nat) : async [Mark] {
-    let allMarks = marks.values().toArray();
-    let filtered = allMarks.filter(
-      func(mark) {
-        mark.studentId == studentId;
-      }
-    );
-    filtered.sort();
-  };
-
-  public query ({ caller }) func getMarksByAssessment(subjectId : Nat, assessmentId : Nat) : async [Mark] {
-    let allMarks = marks.values().toArray();
-    let filtered = allMarks.filter(
-      func(mark) {
-        mark.subjectId == subjectId and mark.assessmentId == assessmentId;
-      }
-    );
-    filtered.sort();
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view assessments");
+    };
+    assessments.values().toArray().sort(compareAssessments);
   };
 
   public query ({ caller }) func getAllMarks() : async [Mark] {
-    marks.values().toArray().sort();
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view marks");
+    };
+    marks.values().toArray().sort(compareMarks);
+  };
+
+  public query ({ caller }) func getMarksByStudent(studentId : Nat) : async [Mark] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view marks");
+    };
+    let allMarks = marks.values().toArray();
+    let filtered = allMarks.filter(func(mark) { mark.studentId == studentId });
+    filtered.sort(compareMarks);
+  };
+
+  public query ({ caller }) func getMarksByAssessment(subjectId : Nat, assessmentId : Nat) : async [Mark] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only teachers can view marks");
+    };
+    let allMarks = marks.values().toArray();
+    let filtered = allMarks.filter(func(mark) { mark.subjectId == subjectId and mark.assessmentId == assessmentId });
+    filtered.sort(compareMarks);
   };
 };

@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Assessment, Mark, Student, Subject } from "../backend.d";
+import type {
+  Assessment,
+  BehaviourRecord,
+  Mark,
+  Student,
+  Subject,
+} from "../backend.d";
 import { useActor } from "./useActor";
 
 // ─── Read Queries ──────────────────────────────────────────────────────────
@@ -260,6 +266,44 @@ export function useImportMarks() {
       void queryClient.invalidateQueries({ queryKey: ["students"] });
       void queryClient.invalidateQueries({ queryKey: ["subjects"] });
       void queryClient.invalidateQueries({ queryKey: ["assessments"] });
+    },
+  });
+}
+
+// ─── Behaviour & Advice ─────────────────────────────────────────────────────
+
+export function useBehaviourRecord(studentId: bigint) {
+  const { actor, isFetching } = useActor();
+  return useQuery<BehaviourRecord | null>({
+    queryKey: ["behaviour", studentId.toString()],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getBehaviourRecord(studentId);
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useSaveBehaviourRecord() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      studentId,
+      behaviourComment,
+      advice,
+    }: {
+      studentId: bigint;
+      behaviourComment: string;
+      advice: string;
+    }) => {
+      if (!actor) throw new Error("Not connected");
+      return actor.saveBehaviourRecord(studentId, behaviourComment, advice);
+    },
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({
+        queryKey: ["behaviour", variables.studentId.toString()],
+      });
     },
   });
 }

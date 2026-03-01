@@ -32,6 +32,12 @@ export const Student = IDL.Record({
   'grade' : IDL.Text,
 });
 export const Subject = IDL.Record({ 'id' : IDL.Nat, 'name' : IDL.Text });
+export const BehaviourRecord = IDL.Record({
+  'studentId' : IDL.Nat,
+  'behaviourComment' : IDL.Text,
+  'advice' : IDL.Text,
+});
+export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -52,6 +58,12 @@ export const idlService = IDL.Service({
   'getAllMarks' : IDL.Func([], [IDL.Vec(Mark)], ['query']),
   'getAllStudents' : IDL.Func([], [IDL.Vec(Student)], ['query']),
   'getAllSubjects' : IDL.Func([], [IDL.Vec(Subject)], ['query']),
+  'getBehaviourRecord' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(BehaviourRecord)],
+      ['query'],
+    ),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getMarksByAssessment' : IDL.Func(
       [IDL.Nat, IDL.Nat],
@@ -59,8 +71,15 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getMarksByStudent' : IDL.Func([IDL.Nat], [IDL.Vec(Mark)], ['query']),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
   'importMarks' : IDL.Func([IDL.Vec(Mark)], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'saveBehaviourRecord' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updateAssessment' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
       [],
@@ -97,6 +116,12 @@ export const idlFactory = ({ IDL }) => {
     'grade' : IDL.Text,
   });
   const Subject = IDL.Record({ 'id' : IDL.Nat, 'name' : IDL.Text });
+  const BehaviourRecord = IDL.Record({
+    'studentId' : IDL.Nat,
+    'behaviourComment' : IDL.Text,
+    'advice' : IDL.Text,
+  });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -117,6 +142,12 @@ export const idlFactory = ({ IDL }) => {
     'getAllMarks' : IDL.Func([], [IDL.Vec(Mark)], ['query']),
     'getAllStudents' : IDL.Func([], [IDL.Vec(Student)], ['query']),
     'getAllSubjects' : IDL.Func([], [IDL.Vec(Subject)], ['query']),
+    'getBehaviourRecord' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(BehaviourRecord)],
+        ['query'],
+      ),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getMarksByAssessment' : IDL.Func(
         [IDL.Nat, IDL.Nat],
@@ -124,8 +155,15 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getMarksByStudent' : IDL.Func([IDL.Nat], [IDL.Vec(Mark)], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
     'importMarks' : IDL.Func([IDL.Vec(Mark)], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'saveBehaviourRecord' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updateAssessment' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
         [],
