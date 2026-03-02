@@ -1,36 +1,35 @@
 # Student Performance Tracker
 
 ## Current State
-The app has a student detail page (`StudentDetailPage.tsx`) that shows score trends, subject breakdowns, projected outcomes, and auto-generated IGCSE academic comments per student. There is also a Students list page, Subjects page, Import page, and Reports page. Navigation is via a sidebar with class filter.
-
-The existing IGCSE comments section is academic/performance-focused (strengths, improvements, target skills, teacher note) and is on the individual student detail page.
+- Four class groups: Year 8, Year 9, Form 3, Grade 10
+- Year 8 / Year 9 → KS3 acquisition-focused comments (no exam grades)
+- Form 3 / Grade 10 → Cambridge IGCSE comments and grade boundaries
+- Behaviour & Advice section per student
+- Excel import with subject auto-detection
 
 ## Requested Changes (Diff)
 
 ### Add
-- A new **"Behaviour & Advice"** section on the individual student detail page (below the existing IGCSE comments card).
-- This section allows the teacher to write free-form comments about the student's general classroom behaviour (e.g. attitude, participation, punctuality, respect).
-- A set of quick-select tags for common behaviour descriptors (e.g. "Participates actively", "Needs encouragement", "Respectful", "Disruptive at times", "Punctual", "Late frequently", "Good team player") that pre-fill or append to the textarea.
-- A structured advice field: teacher can type personalised advice for the student aligned to their behaviour patterns (e.g. study habits, attitude improvements, next steps).
-- A "Save" button that persists the behaviour comment and advice text to the backend per student.
-- On load, previously saved comments are fetched and displayed in the fields.
-- A "Copy" button to copy the combined behaviour comment + advice as plain text (useful for report cards).
+- `kenyanCurriculumSyllabus.ts`: KCSE 8-4-4 grade boundaries (A to E, 12-point scale) for Form 3; CBC/CBE achievement levels (EE/ME/AE/BE) for Grade 10
+- `kenyanCurriculumComments.ts`: Personalized comment generators for both Kenyan systems
+- Helper functions `isKcse844Grade()`, `isCbcGrade()`, `getCurriculumLabel()` in igcseComments.ts
+- Reference tables in StudentDetailPage for KCSE (Form 3) and CBC (Grade 10)
+- Backend connection banner in Layout showing "Connecting…" while actor initializes
+- Retry logic (up to 4 retries, exponential back-off) in all data queries (useQueries.ts)
 
 ### Modify
-- Backend `main.mo`: add a `BehaviourRecord` type with fields `studentId: Nat`, `behaviourComment: Text`, `advice: Text`. Add a stable map `behaviourRecords: Map<Nat, BehaviourRecord>`. Add `saveBehaviourRecord(studentId: Nat, behaviourComment: Text, advice: Text)` update function and `getBehaviourRecord(studentId: Nat)` query function.
-- `backend.d.ts` / `useQueries.ts`: add hooks `useBehaviourRecord(studentId)` and `useSaveBehaviourRecord()`.
+- `igcseComments.ts` dispatcher: Form 3 → Kenya 8-4-4/KCSE; Grade 10 → Kenya CBC/CBE; Year 8/9 → KS3 (unchanged); everything else → IGCSE
+- `StudentDetailPage.tsx`: grade badge label, comments card subtitle, skills panel label, and reference table all adapt to the student's curriculum
+- `Layout.tsx`: imports useActor, shows amber banner when backend is still initializing
 
 ### Remove
-- Nothing removed.
+- Nothing removed
 
 ## Implementation Plan
-1. Update `main.mo` to add `BehaviourRecord` type, stable map, save and get functions.
-2. Update `backend.d.ts` to expose the new types and functions.
-3. Add `useBehaviourRecord` query hook and `useSaveBehaviourRecord` mutation hook in `useQueries.ts`.
-4. Add a `BehaviourCard` component to `StudentDetailPage.tsx`:
-   - Quick-tag chips (click to append tag to behaviour textarea).
-   - Behaviour comment `Textarea`.
-   - Personalised advice `Textarea`.
-   - Save button with loading state.
-   - Copy button that combines both fields.
-   - Pre-fills from backend on load.
+1. Create kenyanCurriculumSyllabus.ts with KCSE and CBC grade data
+2. Create kenyanCurriculumComments.ts with full comment generators for both systems
+3. Add routing helpers and update dispatcher in igcseComments.ts
+4. Update StudentDetailPage to use new helpers and show correct reference table per curriculum
+5. Add retry options to all queries in useQueries.ts
+6. Add backend connection banner to Layout.tsx
+7. Build and deploy

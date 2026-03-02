@@ -61,10 +61,10 @@ const EXAM_ORDER = [
 ];
 
 const TERM_COLORS: Record<string, string> = {
-  "Term 1": "oklch(0.52 0.18 255)",
-  "Term 2": "oklch(0.56 0.16 150)",
-  "Term 3": "oklch(0.68 0.2 35)",
-  "Term 4": "oklch(0.64 0.2 295)",
+  "Term 1": "oklch(0.42 0.16 260)",
+  "Term 2": "oklch(0.62 0.18 145)",
+  "Term 3": "oklch(0.72 0.18 55)",
+  "Term 4": "oklch(0.60 0.18 310)",
 };
 
 function scoreCell(score: number | null, maxScore: number) {
@@ -533,18 +533,18 @@ export default function SubjectDetailPage() {
                     >
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="oklch(0.88 0.015 255)"
+                        stroke="oklch(0.88 0.012 80)"
                         vertical={false}
                       />
                       <XAxis
                         dataKey="term"
-                        tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                        tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
                         domain={[0, 100]}
-                        tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                        tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                         axisLine={false}
                         tickLine={false}
                         tickFormatter={(v) => `${v}%`}
@@ -552,8 +552,8 @@ export default function SubjectDetailPage() {
                       <Tooltip
                         formatter={(v: number, name: string) => [`${v}%`, name]}
                         contentStyle={{
-                          background: "oklch(1 0 0)",
-                          border: "1px solid oklch(0.88 0.015 255)",
+                          background: "oklch(0.995 0.002 80)",
+                          border: "1px solid oklch(0.88 0.012 80)",
                           borderRadius: "6px",
                           fontSize: "12px",
                         }}
@@ -561,10 +561,10 @@ export default function SubjectDetailPage() {
                       <Legend wrapperStyle={{ fontSize: "11px" }} />
                       {studentRows.map((row, i) => {
                         const colors = [
-                          "oklch(0.52 0.18 255)",
-                          "oklch(0.56 0.16 150)",
-                          "oklch(0.68 0.2 35)",
-                          "oklch(0.64 0.2 295)",
+                          "oklch(0.42 0.16 260)",
+                          "oklch(0.62 0.18 145)",
+                          "oklch(0.72 0.18 55)",
+                          "oklch(0.60 0.18 310)",
                           "oklch(0.60 0.18 20)",
                           "oklch(0.55 0.15 310)",
                         ];

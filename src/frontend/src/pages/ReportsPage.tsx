@@ -43,24 +43,24 @@ import {
 import { mean, round, stdDev, toPercent } from "../utils/statistics";
 
 const TERM_COLORS = [
-  "oklch(0.52 0.18 255)",
-  "oklch(0.56 0.16 150)",
-  "oklch(0.68 0.2 35)",
-  "oklch(0.64 0.2 295)",
+  "oklch(0.42 0.16 260)",
+  "oklch(0.62 0.18 145)",
+  "oklch(0.72 0.18 55)",
+  "oklch(0.60 0.18 310)",
 ];
 
 const BUCKET_COLORS = [
   "oklch(0.65 0.22 27)",
-  "oklch(0.72 0.2 45)",
-  "oklch(0.56 0.16 150)",
-  "oklch(0.52 0.18 255)",
+  "oklch(0.70 0.18 55)",
+  "oklch(0.62 0.18 145)",
+  "oklch(0.42 0.16 260)",
 ];
 
 const CLASS_BAR_COLORS: Record<string, string> = {
-  "Year 8": "oklch(0.52 0.18 255)",
-  "Year 9": "oklch(0.56 0.16 150)",
-  "Form 3": "oklch(0.68 0.2 35)",
-  "Grade 10": "oklch(0.64 0.2 295)",
+  "Year 8": "oklch(0.42 0.16 260)",
+  "Year 9": "oklch(0.62 0.18 145)",
+  "Form 3": "oklch(0.72 0.18 55)",
+  "Grade 10": "oklch(0.60 0.18 310)",
 };
 
 export default function ReportsPage() {
@@ -251,18 +251,18 @@ export default function ReportsPage() {
                   <BarChart data={crossClassData} barSize={40}>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="oklch(0.88 0.015 255)"
+                      stroke="oklch(0.88 0.012 80)"
                       vertical={false}
                     />
                     <XAxis
                       dataKey="class"
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       domain={[0, 100]}
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                       tickFormatter={(v) => `${v}%`}
@@ -270,8 +270,8 @@ export default function ReportsPage() {
                     <Tooltip
                       formatter={(v: number) => [`${v}%`, "Average"]}
                       contentStyle={{
-                        background: "oklch(1 0 0)",
-                        border: "1px solid oklch(0.88 0.015 255)",
+                        background: "oklch(0.995 0.002 80)",
+                        border: "1px solid oklch(0.88 0.012 80)",
                         borderRadius: "6px",
                         fontSize: "12px",
                       }}
@@ -317,18 +317,18 @@ export default function ReportsPage() {
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="oklch(0.88 0.015 255)"
+                      stroke="oklch(0.88 0.012 80)"
                       vertical={false}
                     />
                     <XAxis
                       dataKey="subject"
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       domain={[0, 100]}
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                       tickFormatter={(v) => `${v}%`}
@@ -336,8 +336,8 @@ export default function ReportsPage() {
                     <Tooltip
                       formatter={(v: number, name: string) => [`${v}%`, name]}
                       contentStyle={{
-                        background: "oklch(1 0 0)",
-                        border: "1px solid oklch(0.88 0.015 255)",
+                        background: "oklch(0.995 0.002 80)",
+                        border: "1px solid oklch(0.88 0.012 80)",
                         borderRadius: "6px",
                         fontSize: "12px",
                       }}
@@ -514,17 +514,17 @@ export default function ReportsPage() {
                   <BarChart data={stdDevData} barSize={28}>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="oklch(0.88 0.015 255)"
+                      stroke="oklch(0.88 0.012 80)"
                       vertical={false}
                     />
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 10, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 10, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                       tickFormatter={(v) => `${v}%`}
@@ -535,8 +535,8 @@ export default function ReportsPage() {
                         name === "stdDev" ? "Std Deviation" : "Class Average",
                       ]}
                       contentStyle={{
-                        background: "oklch(1 0 0)",
-                        border: "1px solid oklch(0.88 0.015 255)",
+                        background: "oklch(0.995 0.002 80)",
+                        border: "1px solid oklch(0.88 0.012 80)",
                         borderRadius: "6px",
                         fontSize: "12px",
                       }}
@@ -549,8 +549,8 @@ export default function ReportsPage() {
                             entry.stdDev > 20
                               ? "oklch(0.65 0.22 27)"
                               : entry.stdDev > 12
-                                ? "oklch(0.72 0.2 45)"
-                                : "oklch(0.52 0.18 255)"
+                                ? "oklch(0.72 0.18 55)"
+                                : "oklch(0.42 0.16 260)"
                           }
                         />
                       ))}
@@ -592,18 +592,18 @@ export default function ReportsPage() {
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="oklch(0.88 0.015 255)"
+                      stroke="oklch(0.88 0.012 80)"
                       vertical={false}
                     />
                     <XAxis
                       dataKey="range"
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       allowDecimals={false}
-                      tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                      tick={{ fontSize: 11, fill: "oklch(0.50 0.025 260)" }}
                       axisLine={false}
                       tickLine={false}
                       label={{
@@ -611,7 +611,7 @@ export default function ReportsPage() {
                         angle: -90,
                         position: "insideLeft",
                         fontSize: 10,
-                        fill: "oklch(0.52 0.02 255)",
+                        fill: "oklch(0.50 0.025 260)",
                       }}
                     />
                     <Tooltip
@@ -620,8 +620,8 @@ export default function ReportsPage() {
                         name,
                       ]}
                       contentStyle={{
-                        background: "oklch(1 0 0)",
-                        border: "1px solid oklch(0.88 0.015 255)",
+                        background: "oklch(0.995 0.002 80)",
+                        border: "1px solid oklch(0.88 0.012 80)",
                         borderRadius: "6px",
                         fontSize: "12px",
                       }}

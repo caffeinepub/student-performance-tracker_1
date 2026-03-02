@@ -3,9 +3,25 @@
 @tailwind utilities;
 
 @font-face {
+  font-family: "Fraunces";
+  src: url("/assets/fonts/Fraunces-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Cabinet Grotesk";
   src: url("/assets/fonts/CabinetGrotesk-Variable.woff2") format("woff2");
   font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/assets/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 200 700;
   font-style: normal;
   font-display: swap;
 }
@@ -28,96 +44,96 @@
 
 @layer base {
   :root {
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Slate-teal professional theme */
-    --background: 0.975 0.005 240;
-    --foreground: 0.18 0.025 255;
-    --card: 1 0 0;
-    --card-foreground: 0.18 0.025 255;
-    --popover: 1 0 0;
-    --popover-foreground: 0.18 0.025 255;
-    --primary: 0.42 0.12 255;
+    /* Warm ink-navy + amber gold editorial theme */
+    --background: 0.97 0.008 80;
+    --foreground: 0.15 0.03 260;
+    --card: 0.995 0.002 80;
+    --card-foreground: 0.15 0.03 260;
+    --popover: 0.995 0.002 80;
+    --popover-foreground: 0.15 0.03 260;
+    --primary: 0.38 0.14 260;
     --primary-foreground: 0.98 0 0;
-    --secondary: 0.94 0.012 255;
-    --secondary-foreground: 0.28 0.04 255;
-    --muted: 0.94 0.008 240;
-    --muted-foreground: 0.52 0.02 255;
-    --accent: 0.94 0.012 255;
-    --accent-foreground: 0.28 0.04 255;
+    --secondary: 0.93 0.018 80;
+    --secondary-foreground: 0.28 0.04 260;
+    --muted: 0.93 0.01 80;
+    --muted-foreground: 0.50 0.025 260;
+    --accent: 0.78 0.14 75;
+    --accent-foreground: 0.12 0.03 70;
     --destructive: 0.577 0.245 27.325;
     --destructive-foreground: 0.985 0 0;
-    --success: 0.56 0.16 150;
+    --success: 0.56 0.16 145;
     --success-foreground: 0.98 0 0;
-    --warning: 0.72 0.16 60;
-    --warning-foreground: 0.18 0 0;
-    --border: 0.88 0.015 255;
-    --input: 0.9 0.01 255;
-    --ring: 0.42 0.12 255;
+    --warning: 0.72 0.18 75;
+    --warning-foreground: 0.12 0 0;
+    --border: 0.88 0.012 80;
+    --input: 0.91 0.01 80;
+    --ring: 0.38 0.14 260;
 
-    /* Chart colors - accessible data viz palette */
-    --chart-1: 0.52 0.18 255;
-    --chart-2: 0.56 0.16 150;
-    --chart-3: 0.68 0.2 35;
-    --chart-4: 0.64 0.2 295;
-    --chart-5: 0.6 0.18 195;
-    --chart-above: 0.56 0.16 150;
+    /* Chart colors — warm editorial palette */
+    --chart-1: 0.42 0.16 260;
+    --chart-2: 0.62 0.18 145;
+    --chart-3: 0.72 0.18 55;
+    --chart-4: 0.60 0.18 310;
+    --chart-5: 0.58 0.16 195;
+    --chart-above: 0.62 0.18 145;
     --chart-below: 0.577 0.245 27.325;
-    --chart-neutral: 0.52 0.02 255;
+    --chart-neutral: 0.50 0.025 260;
 
-    /* Sidebar */
-    --sidebar: 0.16 0.04 255;
-    --sidebar-foreground: 0.88 0.02 255;
-    --sidebar-primary: 0.62 0.2 255;
-    --sidebar-primary-foreground: 0.98 0 0;
-    --sidebar-accent: 0.24 0.05 255;
-    --sidebar-accent-foreground: 0.9 0.01 255;
-    --sidebar-border: 0.28 0.04 255;
-    --sidebar-ring: 0.62 0.2 255;
+    /* Sidebar — dark ink */
+    --sidebar: 0.13 0.04 260;
+    --sidebar-foreground: 0.90 0.015 260;
+    --sidebar-primary: 0.72 0.18 55;
+    --sidebar-primary-foreground: 0.10 0.02 70;
+    --sidebar-accent: 0.22 0.05 260;
+    --sidebar-accent-foreground: 0.90 0.015 260;
+    --sidebar-border: 0.25 0.04 260;
+    --sidebar-ring: 0.72 0.18 55;
   }
 
   .dark {
-    --background: 0.12 0.03 255;
-    --foreground: 0.94 0.01 255;
-    --card: 0.16 0.035 255;
-    --card-foreground: 0.94 0.01 255;
-    --popover: 0.19 0.04 255;
-    --popover-foreground: 0.94 0.01 255;
-    --primary: 0.62 0.2 255;
-    --primary-foreground: 0.12 0.03 255;
-    --secondary: 0.24 0.05 255;
-    --secondary-foreground: 0.88 0.02 255;
-    --muted: 0.22 0.04 255;
-    --muted-foreground: 0.6 0.02 255;
-    --accent: 0.24 0.05 255;
-    --accent-foreground: 0.88 0.02 255;
+    --background: 0.11 0.03 260;
+    --foreground: 0.95 0.01 80;
+    --card: 0.15 0.035 260;
+    --card-foreground: 0.95 0.01 80;
+    --popover: 0.18 0.04 260;
+    --popover-foreground: 0.95 0.01 80;
+    --primary: 0.72 0.18 55;
+    --primary-foreground: 0.10 0.02 70;
+    --secondary: 0.22 0.04 260;
+    --secondary-foreground: 0.88 0.02 260;
+    --muted: 0.20 0.04 260;
+    --muted-foreground: 0.60 0.02 260;
+    --accent: 0.72 0.18 55;
+    --accent-foreground: 0.10 0.02 70;
     --destructive: 0.65 0.22 27;
     --destructive-foreground: 0.12 0.02 0;
-    --success: 0.55 0.15 150;
+    --success: 0.55 0.15 145;
     --success-foreground: 0.12 0 0;
-    --warning: 0.7 0.16 60;
+    --warning: 0.70 0.16 75;
     --warning-foreground: 0.12 0 0;
-    --border: 0.28 0.04 255;
-    --input: 0.26 0.04 255;
-    --ring: 0.62 0.2 255;
+    --border: 0.26 0.04 260;
+    --input: 0.24 0.04 260;
+    --ring: 0.72 0.18 55;
 
-    --chart-1: 0.62 0.2 255;
-    --chart-2: 0.6 0.18 150;
-    --chart-3: 0.72 0.2 45;
-    --chart-4: 0.67 0.22 295;
+    --chart-1: 0.62 0.20 260;
+    --chart-2: 0.64 0.18 145;
+    --chart-3: 0.76 0.20 55;
+    --chart-4: 0.65 0.20 310;
     --chart-5: 0.65 0.18 195;
-    --chart-above: 0.6 0.18 150;
+    --chart-above: 0.64 0.18 145;
     --chart-below: 0.65 0.22 27;
-    --chart-neutral: 0.55 0.02 255;
+    --chart-neutral: 0.55 0.02 260;
 
-    --sidebar: 0.12 0.03 255;
-    --sidebar-foreground: 0.88 0.02 255;
-    --sidebar-primary: 0.62 0.2 255;
-    --sidebar-primary-foreground: 0.12 0.03 255;
-    --sidebar-accent: 0.2 0.04 255;
-    --sidebar-accent-foreground: 0.88 0.02 255;
-    --sidebar-border: 0.22 0.04 255;
-    --sidebar-ring: 0.62 0.2 255;
+    --sidebar: 0.10 0.03 260;
+    --sidebar-foreground: 0.90 0.015 260;
+    --sidebar-primary: 0.72 0.18 55;
+    --sidebar-primary-foreground: 0.10 0.02 70;
+    --sidebar-accent: 0.20 0.04 260;
+    --sidebar-accent-foreground: 0.90 0.015 260;
+    --sidebar-border: 0.22 0.04 260;
+    --sidebar-ring: 0.72 0.18 55;
   }
 
   * {
@@ -126,7 +142,26 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Satoshi", sans-serif;
+    font-family: "General Sans", "Satoshi", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Display headings — Fraunces editorial feel */
+  h1, h2, h3, h4 {
+    font-family: "Fraunces", "Cabinet Grotesk", serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Strong visual hierarchy for h1 */
+  h1 {
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-weight: 600;
+    line-height: 1.25;
   }
 }
 
@@ -149,4 +184,40 @@
 /* Chart container fix */
 .recharts-responsive-container {
   min-height: 0;
+}
+
+/* Pulse animation for backend connecting banner */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* Sidebar gradient */
+.sidebar-gradient {
+  background: linear-gradient(
+    180deg,
+    oklch(0.13 0.04 260) 0%,
+    oklch(0.17 0.05 260) 100%
+  );
+}
+
+/* Card warm elevation */
+.card-warm {
+  box-shadow:
+    0 1px 3px 0 oklch(0.15 0.03 260 / 0.08),
+    0 1px 2px -1px oklch(0.15 0.03 260 / 0.06);
+}
+
+/* Editorial accent border */
+.accent-border-left {
+  border-left: 4px solid oklch(var(--accent));
+}
+
+/* Stat box premium feel */
+.stat-box-premium {
+  background: linear-gradient(135deg, oklch(var(--card)) 0%, oklch(0.97 0.012 80) 100%);
 }

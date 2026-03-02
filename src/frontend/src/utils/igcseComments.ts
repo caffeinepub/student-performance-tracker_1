@@ -2,6 +2,10 @@
  * Cambridge IGCSE French – Personalized Student Comment Generator
  * All generated text is in French.
  * Comments are aligned to the Cambridge IGCSE French syllabus (0520 / 7156).
+ *
+ * Grade routing:
+ *  - Year 8 / Year 9  → KS3 language acquisition framework
+ *  - Form 3 / Grade 10 → Cambridge IGCSE exam preparation framework
  */
 import {
   getIgcseGrade,
@@ -9,6 +13,11 @@ import {
   getRelevantGrammarTopics,
   getRelevantThemes,
 } from "./igcseSyllabus";
+import {
+  generateCbcComments,
+  generateKcse844Comments,
+} from "./kenyanCurriculumComments";
+import { generateKs3Comments as generateKs3CommentsInternal } from "./ks3Comments";
 
 export interface IgcseCommentParams {
   studentName: string;
@@ -389,9 +398,75 @@ ${igcseGrade.teacherNote}`;
 // Main export
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Grade-level detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true when the student is in a KS1/2/3 year group (Year 8 / Year 9).
+ * These students are focused on language acquisition, not IGCSE exam preparation.
+ */
+export function isKs3Grade(grade: string): boolean {
+  const g = grade.toLowerCase().trim();
+  return (
+    g.includes("year 8") ||
+    g.includes("yr 8") ||
+    g.includes("y8") ||
+    g.includes("year 9") ||
+    g.includes("yr 9") ||
+    g.includes("y9")
+  );
+}
+
+/**
+ * Returns true when the student is in Kenya 8-4-4 Form 3 (KCSE-bound).
+ */
+export function isKcse844Grade(grade: string): boolean {
+  const g = grade.toLowerCase().trim();
+  return g.includes("form 3") || g.includes("form3") || g.includes("f3");
+}
+
+/**
+ * Returns true when the student is in Kenya CBC/CBE Grade 10.
+ */
+export function isCbcGrade(grade: string): boolean {
+  const g = grade.toLowerCase().trim();
+  return g.includes("grade 10") || g.includes("grade10") || g.includes("gr10");
+}
+
+/**
+ * Returns a human-readable curriculum label for a given grade string.
+ */
+export function getCurriculumLabel(grade: string): string {
+  if (isKs3Grade(grade)) return "KS3 Français (acquisition)";
+  if (isKcse844Grade(grade)) return "Kenya 8-4-4 · Form 3 · KCSE Français";
+  if (isCbcGrade(grade)) return "Kenya CBC/CBE · Grade 10 · Français";
+  return "Cambridge IGCSE Français";
+}
+
+// ---------------------------------------------------------------------------
+// Smart dispatcher – routes to correct curriculum generator based on grade
+// ---------------------------------------------------------------------------
+
 export function generateIgcseComments(
   params: IgcseCommentParams,
 ): IgcseComment {
+  // Year 8 / Year 9 → KS3 language acquisition
+  if (isKs3Grade(params.grade)) {
+    return generateKs3CommentsInternal(params);
+  }
+
+  // Form 3 → Kenya 8-4-4 / KCSE
+  if (isKcse844Grade(params.grade)) {
+    return generateKcse844Comments(params);
+  }
+
+  // Grade 10 → Kenya CBC/CBE
+  if (isCbcGrade(params.grade)) {
+    return generateCbcComments(params);
+  }
+
+  // Default: Cambridge IGCSE (international)
   const summary = buildSummary(params);
   const strengths = buildStrengths(params);
   const improvements = buildImprovements(params);

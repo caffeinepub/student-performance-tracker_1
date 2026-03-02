@@ -10,6 +10,12 @@ import { useActor } from "./useActor";
 
 // ─── Read Queries ──────────────────────────────────────────────────────────
 
+/** Shared retry config: up to 4 retries, capped at 30s, exponential back-off */
+const QUERY_RETRY_OPTIONS = {
+  retry: 4,
+  retryDelay: (attempt: number) => Math.min(1500 * 2 ** attempt, 30000),
+} as const;
+
 export function useStudents() {
   const { actor, isFetching } = useActor();
   return useQuery<Student[]>({
@@ -19,6 +25,7 @@ export function useStudents() {
       return actor.getAllStudents();
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 
@@ -31,6 +38,7 @@ export function useSubjects() {
       return actor.getAllSubjects();
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 
@@ -43,6 +51,7 @@ export function useAssessments() {
       return actor.getAllAssessments();
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 
@@ -55,6 +64,7 @@ export function useMarks() {
       return actor.getAllMarks();
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 
@@ -67,6 +77,7 @@ export function useMarksByStudent(studentId: bigint) {
       return actor.getMarksByStudent(studentId);
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 
@@ -281,6 +292,7 @@ export function useBehaviourRecord(studentId: bigint) {
       return actor.getBehaviourRecord(studentId);
     },
     enabled: !!actor && !isFetching,
+    ...QUERY_RETRY_OPTIONS,
   });
 }
 

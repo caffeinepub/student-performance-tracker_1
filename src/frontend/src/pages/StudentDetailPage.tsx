@@ -58,11 +58,22 @@ import {
 import {
   type IgcseCommentParams,
   generateIgcseComments,
+  getCurriculumLabel,
+  isCbcGrade,
+  isKcse844Grade,
+  isKs3Grade,
 } from "../utils/igcseComments";
 import {
   type GradeBoundary,
   IGCSE_GRADE_BOUNDARIES,
 } from "../utils/igcseSyllabus";
+import {
+  CBC_ACHIEVEMENT_LEVELS,
+  type CbcAchievementLevel,
+  KCSE_GRADE_BOUNDARIES,
+  type KcseGradeBoundary,
+} from "../utils/kenyanCurriculumSyllabus";
+import { KS3_FRENCH_BANDS, type Ks3Band } from "../utils/ks3FrenchSyllabus";
 import {
   SAMPLE_ASSESSMENTS,
   SAMPLE_MARKS,
@@ -338,11 +349,55 @@ export default function StudentDetailPage() {
   // Use generated text as the editable textarea content (teacher can modify before copying)
   const editableCommentText = commentText ?? igcseComments?.fullText ?? "";
 
+  // Grade badge color per curriculum type
+  const gradeBadgeStyle = (() => {
+    if (isKs3Grade(student.grade)) {
+      // KS3 — warm amber
+      return {
+        bg: "bg-amber-100 text-amber-900 ring-1 ring-amber-300/60",
+        dot: "bg-amber-500",
+      };
+    }
+    if (isKcse844Grade(student.grade)) {
+      // KCSE 8-4-4 — orange
+      return {
+        bg: "bg-orange-100 text-orange-900 ring-1 ring-orange-300/60",
+        dot: "bg-orange-500",
+      };
+    }
+    if (isCbcGrade(student.grade)) {
+      // CBC — teal
+      return {
+        bg: "bg-teal-100 text-teal-900 ring-1 ring-teal-300/60",
+        dot: "bg-teal-500",
+      };
+    }
+    // Cambridge IGCSE — navy
+    return {
+      bg: "bg-primary/10 text-primary ring-1 ring-primary/20",
+      dot: "bg-primary",
+    };
+  })();
+
+  const chartAxisTick = { fontSize: 11, fill: "oklch(0.50 0.025 260)" };
+  const chartGridColor = "oklch(0.88 0.012 80)";
+  const chartTooltipStyle = {
+    background: "oklch(0.995 0.002 80)",
+    border: "1px solid oklch(0.88 0.012 80)",
+    borderRadius: "8px",
+    fontSize: "12px",
+    boxShadow: "0 4px 12px oklch(0.15 0.03 260 / 0.08)",
+  };
+
   return (
     <div className="space-y-6 p-6 animate-fade-in">
       {/* Back button */}
       <Link to="/students">
-        <Button variant="ghost" size="sm" className="gap-2 -ml-2 mb-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2 -ml-2 mb-2 text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" />
           All Students
         </Button>
@@ -351,42 +406,61 @@ export default function StudentDetailPage() {
       {/* Student header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 font-display text-2xl font-bold text-primary">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 font-display text-3xl font-bold text-primary ring-1 ring-primary/20">
             {student.name.charAt(0)}
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">
+            <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {student.name}
             </h1>
-            <p className="text-sm text-muted-foreground">{student.grade}</p>
+            <div className="mt-1 flex items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${gradeBadgeStyle.bg}`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${gradeBadgeStyle.dot}`}
+                />
+                {student.grade}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex gap-4 flex-wrap">
-          <div className="rounded-lg border border-border bg-card px-4 py-3 text-center">
-            <p className="font-display text-2xl font-bold text-foreground">
+        <div className="flex gap-3 flex-wrap">
+          {/* Overall Average — premium stat box */}
+          <div className="rounded-xl border border-border bg-card px-5 py-3.5 text-center shadow-card">
+            <p className="font-display text-4xl font-bold text-foreground leading-none">
               {studentAvg}%
             </p>
-            <p className="text-xs text-muted-foreground">Overall Avg</p>
+            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Overall Avg
+            </p>
           </div>
-          <div className="rounded-lg border border-border bg-card px-4 py-3 text-center">
+          <div className="rounded-xl border border-border bg-card px-5 py-3.5 text-center shadow-card">
             <p
-              className={`font-display text-2xl font-bold ${deviation >= 0 ? "text-success" : "text-destructive"}`}
+              className={`font-display text-4xl font-bold leading-none ${deviation >= 0 ? "text-success" : "text-destructive"}`}
             >
               {deviation >= 0 ? "+" : ""}
               {deviation}%
             </p>
-            <p className="text-xs text-muted-foreground">vs Class</p>
+            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              vs Class
+            </p>
           </div>
           {studentMarks.length > 0 && igcseComments && (
-            <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-center">
-              <p className="font-display text-2xl font-bold text-foreground">
+            <div
+              className={`rounded-xl px-5 py-3.5 text-center shadow-card ${gradeBadgeStyle.bg}`}
+            >
+              <p className="font-display text-4xl font-bold leading-none">
                 {igcseComments.igcseGrade}
               </p>
-              <p className="text-xs text-muted-foreground">
-                IGCSE ({igcseComments.igcseUms})
-              </p>
-              <p className="text-[10px] text-muted-foreground">
-                {igcseComments.igcseGradeLabel}
+              <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-widest opacity-70">
+                {isKs3Grade(student.grade)
+                  ? "Niveau KS3"
+                  : isKcse844Grade(student.grade)
+                    ? `KCSE (${igcseComments.igcseUms})`
+                    : isCbcGrade(student.grade)
+                      ? `CBC (${igcseComments.igcseUms})`
+                      : `IGCSE (${igcseComments.igcseUms})`}
               </p>
             </div>
           )}
@@ -401,7 +475,7 @@ export default function StudentDetailPage() {
       >
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="font-display text-base font-semibold">
+            <CardTitle className="font-display text-base font-semibold tracking-tight">
               Score Trend Over Time
             </CardTitle>
           </CardHeader>
@@ -410,18 +484,18 @@ export default function StudentDetailPage() {
               <LineChart data={extendedChartData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="oklch(0.88 0.015 255)"
+                  stroke={chartGridColor}
                   vertical={false}
                 />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                  tick={chartAxisTick}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   domain={[0, 100]}
-                  tick={{ fontSize: 11, fill: "oklch(0.52 0.02 255)" }}
+                  tick={chartAxisTick}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v) => `${v}%`}
@@ -437,12 +511,7 @@ export default function StudentDetailPage() {
                     };
                     return [`${value}%`, labels[name] ?? name];
                   }}
-                  contentStyle={{
-                    background: "oklch(1 0 0)",
-                    border: "1px solid oklch(0.88 0.015 255)",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                  }}
+                  contentStyle={chartTooltipStyle}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: "11px", paddingTop: "12px" }}
@@ -457,22 +526,22 @@ export default function StudentDetailPage() {
                 />
                 <ReferenceLine
                   y={50}
-                  stroke="oklch(0.88 0.015 255)"
+                  stroke="oklch(0.88 0.012 80)"
                   strokeDasharray="2 4"
                 />
                 <Line
                   type="monotone"
                   dataKey="studentScore"
-                  stroke="oklch(0.52 0.18 255)"
+                  stroke="oklch(0.42 0.16 260)"
                   strokeWidth={2.5}
-                  dot={{ r: 4, fill: "oklch(0.52 0.18 255)" }}
+                  dot={{ r: 4, fill: "oklch(0.42 0.16 260)" }}
                   activeDot={{ r: 6 }}
                   connectNulls={false}
                 />
                 <Line
                   type="monotone"
                   dataKey="classAverage"
-                  stroke="oklch(0.56 0.16 150)"
+                  stroke="oklch(0.62 0.18 145)"
                   strokeWidth={1.5}
                   strokeDasharray="5 3"
                   dot={false}
@@ -480,7 +549,7 @@ export default function StudentDetailPage() {
                 <Line
                   type="monotone"
                   dataKey="regression"
-                  stroke="oklch(0.68 0.2 35)"
+                  stroke="oklch(0.72 0.18 55)"
                   strokeWidth={1.5}
                   strokeDasharray="3 3"
                   dot={false}
@@ -641,26 +710,33 @@ export default function StudentDetailPage() {
         </Card>
       </motion.div>
 
-      {/* Personalized IGCSE Comments */}
+      {/* Personalized Comments */}
       {igcseComments && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-primary/20">
+          <Card
+            className="border-l-4 overflow-hidden"
+            style={{ borderLeftColor: "oklch(0.78 0.14 75)" }}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="font-display text-base font-semibold flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-primary" />
+              <CardTitle className="font-display text-base font-semibold flex items-center gap-2 tracking-tight">
+                <MessageSquare
+                  className="h-5 w-5"
+                  style={{ color: "oklch(0.55 0.14 75)" }}
+                />
                 Commentaires personnalisés
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground mt-1">
-                Généré automatiquement · modifiable avant impression
+                {getCurriculumLabel(student.grade)} · généré automatiquement ·
+                modifiable avant impression
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
               {/* Summary */}
-              <p className="text-sm text-foreground leading-relaxed rounded-md bg-muted/40 px-4 py-3 border border-border/50">
+              <p className="text-sm text-foreground leading-relaxed rounded-lg bg-secondary/60 px-4 py-3.5 border border-border/50">
                 {igcseComments.summary}
               </p>
 
@@ -668,7 +744,7 @@ export default function StudentDetailPage() {
               <div className="flex flex-wrap gap-4">
                 {/* Strengths */}
                 <div className="flex-1 min-w-[240px] space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-success flex items-center gap-1.5">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.12em] text-success flex items-center gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Points forts
                   </h4>
@@ -676,9 +752,9 @@ export default function StudentDetailPage() {
                     {igcseComments.strengths.map((strength) => (
                       <li
                         key={strength}
-                        className="flex gap-2 text-sm text-foreground"
+                        className="flex gap-2.5 text-sm text-foreground"
                       >
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                        <span className="mt-1.5 h-2 w-2 rounded-full shrink-0 bg-success" />
                         <span>{strength}</span>
                       </li>
                     ))}
@@ -687,7 +763,10 @@ export default function StudentDetailPage() {
 
                 {/* Improvements */}
                 <div className="flex-1 min-w-[240px] space-y-2">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <h4
+                    className="text-[10px] font-bold uppercase tracking-[0.12em] flex items-center gap-1.5"
+                    style={{ color: "oklch(0.55 0.14 75)" }}
+                  >
                     <AlertCircle className="h-3.5 w-3.5" />
                     Axes d&apos;amélioration
                   </h4>
@@ -695,9 +774,12 @@ export default function StudentDetailPage() {
                     {igcseComments.improvements.map((improvement) => (
                       <li
                         key={improvement}
-                        className="flex gap-2 text-sm text-foreground"
+                        className="flex gap-2.5 text-sm text-foreground"
                       >
-                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                        <span
+                          className="mt-1.5 h-2 w-2 rounded-full shrink-0"
+                          style={{ background: "oklch(0.72 0.18 55)" }}
+                        />
                         <span>{improvement}</span>
                       </li>
                     ))}
@@ -707,8 +789,14 @@ export default function StudentDetailPage() {
 
               {/* Target skills */}
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Compétences à renforcer (IGCSE Français)
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  {isKs3Grade(student.grade)
+                    ? "Compétences à développer (KS3 Français)"
+                    : isKcse844Grade(student.grade)
+                      ? "Compétences à renforcer (KCSE Français · Form 3)"
+                      : isCbcGrade(student.grade)
+                        ? "Compétences CBC à développer (Grade 10)"
+                        : "Compétences à renforcer (IGCSE Français)"}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {igcseComments.targetSkills.map((skill) => (
@@ -727,24 +815,24 @@ export default function StudentDetailPage() {
               <div>
                 <div className="flex items-center gap-1.5 mb-2">
                   <GraduationCap className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                     Note pour l&apos;enseignant(e)
                   </span>
                 </div>
-                <p className="text-sm italic text-muted-foreground rounded-md bg-muted/40 border border-border/50 px-4 py-3 leading-relaxed">
+                <p className="text-sm italic text-muted-foreground rounded-lg bg-secondary/50 border border-border/50 px-4 py-3.5 leading-relaxed">
                   {igcseComments.teacherNote}
                 </p>
               </div>
 
               {/* Editable textarea */}
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   Texte complet (éditable)
                 </h4>
                 <Textarea
                   value={editableCommentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  className="min-h-[200px] font-mono text-xs leading-relaxed resize-y"
+                  className="min-h-[200px] font-mono text-xs leading-relaxed resize-y bg-secondary/50"
                   placeholder="Les commentaires générés apparaîtront ici…"
                 />
               </div>
@@ -765,73 +853,265 @@ export default function StudentDetailPage() {
                 Copier les commentaires
               </Button>
 
-              {/* IGCSE Grade Reference Table */}
-              <details className="group rounded-md border border-border/60 bg-muted/20">
-                <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
-                  <span>
-                    Référence : Barème des notes Cambridge IGCSE (UMS)
-                  </span>
-                  <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
-                    ▾
-                  </span>
-                </summary>
-                <div className="px-4 pb-4 pt-1 overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
-                          Note
-                        </th>
-                        <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
-                          UMS
-                        </th>
-                        <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
-                          Seuil (%)
-                        </th>
-                        <th className="py-1.5 text-left font-semibold text-muted-foreground">
-                          Descripteur
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {IGCSE_GRADE_BOUNDARIES.map((boundary: GradeBoundary) => {
-                        const isCurrentGrade =
-                          boundary.grade === igcseComments.igcseGrade;
-                        return (
-                          <tr
-                            key={boundary.grade}
-                            className={`border-b border-border/40 transition-colors ${
-                              isCurrentGrade
-                                ? "bg-primary/10 font-semibold"
-                                : "hover:bg-muted/40"
-                            }`}
-                          >
-                            <td className="py-1.5 pr-3 font-mono font-bold text-foreground">
-                              {boundary.grade}
-                              {isCurrentGrade && (
-                                <span className="ml-1 text-[9px] text-primary font-normal align-middle">
-                                  ← actuel
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-1.5 pr-3 font-mono text-muted-foreground">
-                              {boundary.umsEquivalent}
-                            </td>
-                            <td className="py-1.5 pr-3 font-mono text-muted-foreground">
-                              {boundary.maxPercent === 100
-                                ? `≥ ${boundary.minPercent}%`
-                                : `${boundary.minPercent}–${boundary.maxPercent}%`}
-                            </td>
-                            <td className="py-1.5 text-muted-foreground">
-                              {boundary.label}
-                            </td>
+              {/* Reference table — adapts to each curriculum */}
+
+              {/* Cambridge IGCSE (Year 8/9 excluded, Form 3/Grade 10 excluded) */}
+              {!isKs3Grade(student.grade) &&
+                !isKcse844Grade(student.grade) &&
+                !isCbcGrade(student.grade) && (
+                  <details className="group rounded-md border border-border/60 bg-muted/20">
+                    <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
+                      <span>
+                        Référence : Barème des notes Cambridge IGCSE (UMS)
+                      </span>
+                      <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
+                        ▾
+                      </span>
+                    </summary>
+                    <div className="px-4 pb-4 pt-1 overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                              Note
+                            </th>
+                            <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                              UMS
+                            </th>
+                            <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                              Seuil (%)
+                            </th>
+                            <th className="py-1.5 text-left font-semibold text-muted-foreground">
+                              Descripteur
+                            </th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
+                        </thead>
+                        <tbody>
+                          {IGCSE_GRADE_BOUNDARIES.map(
+                            (boundary: GradeBoundary) => {
+                              const isCurrentGrade =
+                                boundary.grade === igcseComments.igcseGrade;
+                              return (
+                                <tr
+                                  key={boundary.grade}
+                                  className={`border-b border-border/40 transition-colors ${isCurrentGrade ? "bg-primary/10 font-semibold" : "hover:bg-muted/40"}`}
+                                >
+                                  <td className="py-1.5 pr-3 font-mono font-bold text-foreground">
+                                    {boundary.grade}
+                                    {isCurrentGrade && (
+                                      <span className="ml-1 text-[9px] text-primary font-normal align-middle">
+                                        ← actuel
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                    {boundary.umsEquivalent}
+                                  </td>
+                                  <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                    {boundary.maxPercent === 100
+                                      ? `≥ ${boundary.minPercent}%`
+                                      : `${boundary.minPercent}–${boundary.maxPercent}%`}
+                                  </td>
+                                  <td className="py-1.5 text-muted-foreground">
+                                    {boundary.label}
+                                  </td>
+                                </tr>
+                              );
+                            },
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                )}
+
+              {/* KS3 — Year 8 / Year 9 */}
+              {isKs3Grade(student.grade) && (
+                <details className="group rounded-md border border-border/60 bg-muted/20">
+                  <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
+                    <span>Référence : Niveaux KS3 Français</span>
+                    <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
+                      ▾
+                    </span>
+                  </summary>
+                  <div className="px-4 pb-4 pt-1 overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Niveau
+                          </th>
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Seuil (%)
+                          </th>
+                          <th className="py-1.5 text-left font-semibold text-muted-foreground">
+                            Description
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {KS3_FRENCH_BANDS.map((band: Ks3Band) => {
+                          const isCurrent =
+                            band.band === igcseComments.igcseGrade;
+                          return (
+                            <tr
+                              key={band.band}
+                              className={`border-b border-border/40 transition-colors ${isCurrent ? "bg-primary/10 font-semibold" : "hover:bg-muted/40"}`}
+                            >
+                              <td className="py-1.5 pr-3 font-mono font-bold text-foreground">
+                                {band.band}
+                                {isCurrent && (
+                                  <span className="ml-1 text-[9px] text-primary font-normal align-middle">
+                                    ← actuel
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                {band.maxPercent === 100
+                                  ? `≥ ${band.minPercent}%`
+                                  : `${band.minPercent}–${band.maxPercent}%`}
+                              </td>
+                              <td className="py-1.5 text-muted-foreground">
+                                {band.label}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+              )}
+
+              {/* Kenya 8-4-4 KCSE — Form 3 */}
+              {isKcse844Grade(student.grade) && (
+                <details className="group rounded-md border border-border/60 bg-muted/20">
+                  <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
+                    <span>
+                      Référence : Barème KCSE Français (8-4-4 · Form 3)
+                    </span>
+                    <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
+                      ▾
+                    </span>
+                  </summary>
+                  <div className="px-4 pb-4 pt-1 overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Note KCSE
+                          </th>
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Points
+                          </th>
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Seuil (%)
+                          </th>
+                          <th className="py-1.5 text-left font-semibold text-muted-foreground">
+                            Descripteur
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {KCSE_GRADE_BOUNDARIES.map(
+                          (boundary: KcseGradeBoundary) => {
+                            const isCurrentGrade =
+                              boundary.grade === igcseComments.igcseGrade;
+                            return (
+                              <tr
+                                key={boundary.grade}
+                                className={`border-b border-border/40 transition-colors ${isCurrentGrade ? "bg-primary/10 font-semibold" : "hover:bg-muted/40"}`}
+                              >
+                                <td className="py-1.5 pr-3 font-mono font-bold text-foreground">
+                                  {boundary.grade}
+                                  {isCurrentGrade && (
+                                    <span className="ml-1 text-[9px] text-primary font-normal align-middle">
+                                      ← actuel
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                  {boundary.points}
+                                </td>
+                                <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                  {boundary.maxPercent === 100
+                                    ? `≥ ${boundary.minPercent}%`
+                                    : `${boundary.minPercent}–${boundary.maxPercent}%`}
+                                </td>
+                                <td className="py-1.5 text-muted-foreground">
+                                  {boundary.label}
+                                </td>
+                              </tr>
+                            );
+                          },
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+              )}
+
+              {/* Kenya CBC/CBE — Grade 10 */}
+              {isCbcGrade(student.grade) && (
+                <details className="group rounded-md border border-border/60 bg-muted/20">
+                  <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
+                    <span>
+                      Référence : Niveaux de réalisation CBC (Grade 10)
+                    </span>
+                    <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
+                      ▾
+                    </span>
+                  </summary>
+                  <div className="px-4 pb-4 pt-1 overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Niveau
+                          </th>
+                          <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
+                            Seuil (%)
+                          </th>
+                          <th className="py-1.5 text-left font-semibold text-muted-foreground">
+                            Description
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {CBC_ACHIEVEMENT_LEVELS.map(
+                          (level: CbcAchievementLevel) => {
+                            const isCurrent =
+                              level.level === igcseComments.igcseGrade;
+                            return (
+                              <tr
+                                key={level.level}
+                                className={`border-b border-border/40 transition-colors ${isCurrent ? "bg-primary/10 font-semibold" : "hover:bg-muted/40"}`}
+                              >
+                                <td className="py-1.5 pr-3 font-mono font-bold text-foreground">
+                                  {level.level}
+                                  {isCurrent && (
+                                    <span className="ml-1 text-[9px] text-primary font-normal align-middle">
+                                      ← actuel
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                                  {level.maxPercent === 100
+                                    ? `≥ ${level.minPercent}%`
+                                    : `${level.minPercent}–${level.maxPercent}%`}
+                                </td>
+                                <td className="py-1.5 text-muted-foreground">
+                                  {level.labelFr}
+                                </td>
+                              </tr>
+                            );
+                          },
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+              )}
             </CardContent>
           </Card>
         </motion.div>

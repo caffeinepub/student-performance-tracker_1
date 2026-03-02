@@ -16,8 +16,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Cabinet Grotesk", "sans-serif"],
-        body: ["Satoshi", "sans-serif"],
+        display: ["Fraunces", "Cabinet Grotesk", "serif"],
+        body: ["General Sans", "Satoshi", "sans-serif"],
+        sans: ["General Sans", "Satoshi", "sans-serif"],
         mono: ["Geist Mono", "monospace"],
       },
       colors: {
@@ -110,12 +111,22 @@ export default {
           from: { opacity: "0", transform: "translateX(-16px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        "shimmer": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
         "slide-in-left": "slide-in-left 0.3s ease-out",
+        "pulse-slow": "pulse-slow 2s ease-in-out infinite",
+        "shimmer": "shimmer 2s infinite",
       },
     },
   },
