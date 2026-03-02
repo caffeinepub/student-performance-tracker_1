@@ -377,7 +377,7 @@ function buildFullText(
   const skillLines = targetSkills.map((s) => `• ${s}`).join("\n");
 
   return `Commentaires personnalisés – ${studentName} (${grade})
-Niveau Cambridge IGCSE : ${igcseGrade.grade} (${igcseGrade.umsEquivalent}) — ${igcseGrade.label}
+Note Cambridge IGCSE : ${igcseGrade.grade} — ${igcseGrade.label}
 
 ${summary}
 

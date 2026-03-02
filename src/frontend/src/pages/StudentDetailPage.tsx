@@ -457,10 +457,10 @@ export default function StudentDetailPage() {
                 {isKs3Grade(student.grade)
                   ? "Niveau KS3"
                   : isKcse844Grade(student.grade)
-                    ? `KCSE (${igcseComments.igcseUms})`
+                    ? "KCSE"
                     : isCbcGrade(student.grade)
-                      ? `CBC (${igcseComments.igcseUms})`
-                      : `IGCSE (${igcseComments.igcseUms})`}
+                      ? "CBC"
+                      : "IGCSE"}
               </p>
             </div>
           )}
@@ -862,7 +862,7 @@ export default function StudentDetailPage() {
                   <details className="group rounded-md border border-border/60 bg-muted/20">
                     <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors list-none">
                       <span>
-                        Référence : Barème des notes Cambridge IGCSE (UMS)
+                        Référence : Barème des notes Cambridge IGCSE (A* – U)
                       </span>
                       <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform duration-200 inline-block">
                         ▾
@@ -873,10 +873,7 @@ export default function StudentDetailPage() {
                         <thead>
                           <tr className="border-b border-border">
                             <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
-                              Note
-                            </th>
-                            <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
-                              UMS
+                              Grade
                             </th>
                             <th className="py-1.5 pr-3 text-left font-semibold text-muted-foreground">
                               Seuil (%)
@@ -903,9 +900,6 @@ export default function StudentDetailPage() {
                                         ← actuel
                                       </span>
                                     )}
-                                  </td>
-                                  <td className="py-1.5 pr-3 font-mono text-muted-foreground">
-                                    {boundary.umsEquivalent}
                                   </td>
                                   <td className="py-1.5 pr-3 font-mono text-muted-foreground">
                                     {boundary.maxPercent === 100
